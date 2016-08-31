@@ -1,3 +1,4 @@
 __pycache__/
 tmp/
 afscripting.egg-info/
+*pyc
