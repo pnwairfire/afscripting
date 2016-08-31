@@ -20,5 +20,12 @@ setup(
     ],
     url='https://github.com/pnwairfire/afscripting',
     description='Scripting related utilities',
-    install_requires=[]
+    install_requires=[
+        "afconfig==1.0.0",
+        "afdatetime==1.0.0"
+    ],
+    dependency_links=[
+        "https://pypi.smoke.airfire.org/simple/afconfig/",
+        "https://pypi.smoke.airfire.org/simple/afdatetime/"
+    ]
 )
