@@ -10,8 +10,9 @@ from argparse import (
     ArgumentTypeError, ArgumentParser, Action, RawTextHelpFormatter
 )
 
-from pyairfire.datetime.parsing import parse as parse_datetime
+from afdatetime.parsing import parse as parse_datetime
 from pyairfire.configuration import merge_configs, set_config_value
+
 from .utils import exit_with_msg
 
 __all__ = [
@@ -124,7 +125,7 @@ class ParseDatetimeAction(Action):
         """Parses datetime from string value
 
         Note: Expects value to be of one of the formats listed in
-        pyairfire.datetime.parsing.RECOGNIZED_DATETIME_FORMATS
+        afdatetime.parsing.RECOGNIZED_DATETIME_FORMATS
         """
         try:
             dt = parse_datetime(value)

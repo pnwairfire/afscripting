@@ -6,8 +6,9 @@ import re
 import warnings
 from optparse import OptionValueError, OptionParser
 
+from afdatetime.parsing import parse as _parse_datetime
+
 from .utils import exit_with_msg
-from pyairfire.datetime.parsing import parse as _parse_datetime
 
 __all__ = [
     'add_options',
@@ -120,7 +121,7 @@ def parse_datetime(option, opt, value, parser):
     """Parses datetime from string value
 
     Note: Expects value to be of one of the formats listed in
-    pyairfire.datetime.parsing.RECOGNIZED_DATETIME_FORMATS
+    afdatetime.parsing.RECOGNIZED_DATETIME_FORMATS
     """
     try:
         dt = _parse_datetime(value)
