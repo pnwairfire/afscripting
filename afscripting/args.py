@@ -260,6 +260,27 @@ class ConfigFileAction(Action):
             # subsequent file loaded
             merge_configs(existing_config_dict, config_dict)
 
+class LogLevelAction(Action):
+
+    LOG_LEVELS = [
+        'DEBUG',
+        'INFO',
+        'WARNING',
+        'ERROR',
+        'CRITICAL'
+    ]
+
+    def __call__(self, parser, namespace, value, option_string=None):
+        """Parses log level string ('DEBUG', 'INFO', etc.)
+        """
+        if value:
+            log_level = value.strip().upper()
+            if log_level not in self.LOG_LEVELS:
+                raise ArgumentTypeError('Invalid log level: %s' % (log_level))
+            level = getattr(logging, log_level)
+            setattr(namespace, self.dest, level)
+
+
 ##
 ## Helper Methods
 ##
@@ -334,22 +355,15 @@ def add_configuration_options(parser, support_short_names=False):
 
 ## Logging Related Options
 
-LOG_LEVELS = [
-    'DEBUG',
-    'INFO',
-    'WARNING',
-    'ERROR',
-    'CRITICAL'
-]
-
 def add_logging_options(parser):
     add_arguments(parser, [
         {
             'long': "--log-level",
             'dest': "log_level",
-            'action': "store",
-            'default': None,
-            'help': "python log level (%s)" % (','.join(LOG_LEVELS))
+            'action': LogLevelAction,
+            'default': logging.WARNING,
+            'help': "python log level (%s); default WARNING" % (
+                ','.join(LogLevelAction.LOG_LEVELS))
         },
         {
             'long': "--log-file",
@@ -368,14 +382,7 @@ def add_logging_options(parser):
     ])
 
 def configure_logging_from_args(args, parser):
-    level = logging.WARNING  # default
-    if args.log_level:
-        log_level = args.log_level.upper()
-        if log_level not in LOG_LEVELS:
-            exit_with_msg(
-                'Invalid log level: %s' % (log_level))
-        level = getattr(logging, log_level)
-
     log_message_format = args.log_message_format or '%(asctime)s %(levelname)s: %(message)s'
 
-    logging.basicConfig(format=log_message_format, level=level, filename=args.log_file)
+    logging.basicConfig(format=log_message_format, level=args.log_level,
+        filename=args.log_file)
