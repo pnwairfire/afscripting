@@ -1,6 +1,7 @@
 __author__      = "Joel Dubowy"
 
 import configparser
+import copy
 import datetime
 import json
 import logging
@@ -39,7 +40,8 @@ __all__ = [
 ##  Argument Parsing Methods
 
 def parse_args(required_args, optional_args, positional_args=None, usage=None,
-        epilog=None, post_args_outputter=None, pre_validation=None):
+        epilog=None, post_args_outputter=None, pre_validation=None,
+        support_configuration_options_short_names=False):
     """....
 
     Arguments:
@@ -52,6 +54,7 @@ def parse_args(required_args, optional_args, positional_args=None, usage=None,
         (for when itneeds to be dynamically generated)
      - pre_validation -- callable object that performs any tasks that
         should be done before outputing the parsed args
+     - support_configuration_options_short_names -- e.g. '-c', '-C', '-B', etc.
 
     TODO:
      - support custom positional args
@@ -68,6 +71,8 @@ def parse_args(required_args, optional_args, positional_args=None, usage=None,
         add_arguments(parser, positional_args)
 
     add_logging_options(parser)
+    add_configuration_options(parser,
+        support_configuration_options_short_names)
 
     args = parser.parse_args()
 
@@ -272,6 +277,60 @@ def add_arguments(parser, argument_hashes, required=False):
 def output_args(args):
     for k,v in args.__dict__.items():
         logging.info("%s: %s" % (' '.join(k.split('_')), v))
+
+## Configuration related options
+
+CONFIGURATION_OPTIONS = [
+    {
+        'short': "-C",
+        'long': '--config-option',
+        'dest': 'config_options',
+        'help': "Config option override, formatted like 'section.*.key=stringvalue'",
+        'action': ConfigOptionAction
+    },
+    {
+        'short': "-B",
+        'long': '--boolean-config-option',
+        'dest': 'config_options',
+        'help': "Config option override, formatted like 'section.*.key=boolvalue'",
+        'action': BooleanConfigOptionAction
+    },
+    {
+        'short': "-I",
+        'long': '--integer-config-option',
+        'dest': 'config_options',
+        'help': "Config option override, formatted like 'section.*.key=intvalue'",
+        'action': IntegerConfigOptionAction
+    },
+    {
+        'short': "-F",
+        'long': '--float-config-option',
+        'dest': 'config_options',
+        'help': "Config option override, formatted like 'section.*.key=floatvalue'",
+        'action': FloatConfigOptionAction
+    },
+    {
+        'short': "-J",
+        'long': '--json-config-option',
+        'dest': 'config_options',
+        'help': "Config option override supporting any json formatted value, formatted like 'section.*.key=jsonvalue'",
+        'action': JSONConfigOptionAction
+    },
+    {
+        'short': '-c',
+        'long': '--config-file',
+        'dest': 'config_file_options',
+        'help': 'config file comtaining JSON formatted overrides for default config values',
+        'action': ConfigFileAction
+    }
+]
+
+def add_configuration_options(parser, support_short_names=False):
+    options = copy.copy(CONFIGURATION_OPTIONS)
+    if not support_short_names:
+        for o in options:
+            o.pop('short')
+    add_arguments(parser, options)
 
 ## Logging Related Options
 
