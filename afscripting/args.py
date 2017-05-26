@@ -391,3 +391,35 @@ def configure_logging_from_args(args, parser=None):
 
     logging.basicConfig(format=log_message_format, level=args.log_level,
         filename=args.log_file)
+
+def configure_tornado_logging_from_args(args):
+    """parse_args calls logging.basicConfig. This function configured the
+    tornado gen_log separately
+    """
+    # Import tornado.log inline and don't include in project dependencies;
+    # If a project calls this function, it will have already installed tornado
+    import tornado.log
+
+    # log level
+    if args.log_level:
+        tornado.log.gen_log.setLevel(args.log_level)
+
+    # stream vs file
+    # Note, we need to set propagate to False in order to replace
+    # the default stream formatter handler, which outputs log messages
+    # like "DEBUG:tornado.general: ....".  Without doing this, we'll
+    # have double (and differently formatted) log messages if --log-file
+    # is *not* set, and both stream and file messagses (again, differently
+    # formatted) if --log-file *is* set
+    logging.getLogger("tornado.general").propagate = False
+
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    if args.log_file:
+        file_handler = logging.FileHandler(args.log_file)
+        file_handler.setFormatter(formatter)
+        tornado.log.gen_log.addHandler(file_handler)
+    else:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        tornado.log.gen_log.addHandler(stream_handler)
