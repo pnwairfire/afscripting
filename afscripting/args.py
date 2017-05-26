@@ -413,7 +413,7 @@ def configure_tornado_logging_from_args(args):
     # formatted) if --log-file *is* set
     logging.getLogger("tornado.general").propagate = False
 
-    formatter = logging.Formatter(
+    formatter = logging.Formatter(args.log_message_format or
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
     if args.log_file:
         file_handler = logging.FileHandler(args.log_file)
