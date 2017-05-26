@@ -76,7 +76,7 @@ def parse_args(required_args, optional_args, positional_args=None, usage=None,
 
     args = parser.parse_args()
 
-    configure_logging_from_args(args, parser)
+    configure_logging_from_args(args)
 
     if pre_validation:
         pre_validation(parser, args)
@@ -381,7 +381,12 @@ def add_logging_options(parser):
         },
     ])
 
-def configure_logging_from_args(args, parser):
+def configure_logging_from_args(args, parser=None):
+    """Configures logging from parsed args
+
+    Note: `parser` kwarg is left in the signature for backwards
+      compatibility. It is not used
+    """
     log_message_format = args.log_message_format or '%(asctime)s %(levelname)s: %(message)s'
 
     logging.basicConfig(format=log_message_format, level=args.log_level,
