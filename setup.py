@@ -25,7 +25,7 @@ setup(
         "afdatetime==1.*"
     ],
     dependency_links=[
-        "https://pypi.smoke.airfire.org/simple/afconfig/",
-        "https://pypi.smoke.airfire.org/simple/afdatetime/"
+        "https://pypi.airfire.org/simple/afconfig/",
+        "https://pypi.airfire.org/simple/afdatetime/"
     ]
 )
