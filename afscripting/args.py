@@ -231,34 +231,48 @@ class JSONConfigOptionAction(ConfigOptionAction):
             raise ArgumentTypeError(
                 "Invalid json value: {}".format(val))
 
-class ConfigFileAction(Action):
-    def __call__(self, parser, namespace, value, option_string=None):
-        """Load config settings from json file
-        """
-        filename = os.path.abspath(value.strip())
-        if not os.path.isfile(filename):
-            raise ArgumentTypeError(
-                "File {} does not exist".format(filename))
+def create_config_file_action(recognized_config_keys):
 
-        with open(filename) as f:
-            try:
-                config_dict = json.loads(f.read())
-            except ValueError:
-                raise ArgumentTypeError("File {} contains "
-                    "invalid config JSON data".format(filename))
+    class klass(Action):
+        def __call__(self, parser, namespace, value, option_string=None):
+            """Load config settings from json file
+            """
+            filename = os.path.abspath(value.strip())
+            if not os.path.isfile(filename):
+                raise ArgumentTypeError(
+                    "File {} does not exist".format(filename))
 
-        if 'config' not in config_dict:
-            raise ArgumentTypeError("Config file must contain top "
-                "level 'config' key")
-        config_dict = config_dict['config']
+            with open(filename) as f:
+                try:
+                    config_dict = json.loads(f.read())
+                except ValueError:
+                    raise ArgumentTypeError("File {} contains "
+                        "invalid config JSON data".format(filename))
 
-        existing_config_dict = getattr(namespace, self.dest)
-        if not existing_config_dict:
-            # first file loaded
-            setattr(namespace, self.dest, config_dict)
-        else:
-            # subsequent file loaded
-            merge_configs(existing_config_dict, config_dict)
+            config_dict = None
+            for k in recognized_config_keys:
+                if k in config_dict:
+                    config_dict = config_dict[k]
+                    # use the first recognized key
+                    break
+
+            if config_dict is None:
+                raise ArgumentTypeError("Config file must contain a top "
+                    "level config key - '{}' ".format(
+                        "', '".join(recognized_config_keys)))
+
+
+            existing_config_dict = getattr(namespace, self.dest)
+            if not existing_config_dict:
+                # first file loaded
+                setattr(namespace, self.dest, config_dict)
+            else:
+                # subsequent file loaded
+                merge_configs(existing_config_dict, config_dict)
+
+    return klass
+
+ConfigFileAction = create_config_file_action(['config'])
 
 class LogLevelAction(Action):
 
