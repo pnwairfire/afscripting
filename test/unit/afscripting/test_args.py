@@ -63,10 +63,13 @@ class TestCreateConfigFileAction(object):
             }''')
             f.flush()
             p = self.add_option_and_parse([f.name])
-            p.config_file_options = {}
+            assert p.config_file_options == {
+                "Foo": "bar"
+            }
 
-    def test_altername_keys(self):
+    def test_altername_keys_both_defined(self):
         with tempfile.NamedTemporaryFile('w+t') as f:
+            # takes whichever key occurs first in list
             f.write('''{
                 "config": {
                     "Foo": "bar"
@@ -79,8 +82,32 @@ class TestCreateConfigFileAction(object):
                 }
             }''')
             f.flush()
-            p = self.add_option_and_parse([f.name], keys=["config","run_config"])
-            p.config_file_options = {}
+            p = self.add_option_and_parse([f.name],
+                keys=["config", "run_config"])
+            assert p.config_file_options == {"Foo": "bar"}
+            p = self.add_option_and_parse([f.name],
+                keys=["run_config", "config"])
+            assert p.config_file_options == {"bar": "sdfsdfsdf"}
+
+    def test_altername_keys_one_defined(self):
+        with tempfile.NamedTemporaryFile('w+t') as f:
+            # takes whichever key occurs first in list
+            f.write('''{
+                "config": {
+                    "Foo": "bar"
+                },
+                "ignored": {
+                    "SDF": 1123
+                }
+            }''')
+            f.flush()
+            p = self.add_option_and_parse([f.name],
+                keys=["run_config", "config"])
+            assert p.config_file_options == {"Foo": "bar"}
+            p = self.add_option_and_parse([f.name],
+                keys=["config", "run_config"])
+            assert p.config_file_options == {"Foo": "bar"}
+
 
     def test_multiple_files(self):
         with tempfile.NamedTemporaryFile('w+t') as f1:
@@ -100,4 +127,8 @@ class TestCreateConfigFileAction(object):
                 }''')
                 f2.flush()
                 p = self.add_option_and_parse([f1.name, f2.name])
-                p.config_file_options = {}
+                assert p.config_file_options == {
+                    "Foo": "bar",
+                    "bar": "sdfsdf",
+                    "baz": 123123
+                }
