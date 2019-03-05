@@ -23,6 +23,7 @@ as useful dev packages:
 
     pip install -r requirements.txt
     pip install -r requirements-dev.txt
+    pip install -r requirements-test.txt
 
 ### Setup Environment
 
@@ -47,6 +48,8 @@ If you get an error like    ```AttributeError: 'NoneType' object has no attribut
 
     pip install --upgrade pip
 
-## Usage:
+### Tests
 
-Run each script with the `-h` option to see its usage.
+Run
+
+    py.test
