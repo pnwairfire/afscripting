@@ -244,15 +244,15 @@ def create_config_file_action(recognized_config_keys):
 
             with open(filename) as f:
                 try:
-                    config_dict = json.loads(f.read())
+                    file_contents = json.loads(f.read())
                 except ValueError:
                     raise ArgumentTypeError("File {} contains "
                         "invalid config JSON data".format(filename))
 
             config_dict = None
             for k in recognized_config_keys:
-                if k in config_dict:
-                    config_dict = config_dict[k]
+                if k in file_contents:
+                    config_dict = file_contents[k]
                     # use the first recognized key
                     break
 
