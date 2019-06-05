@@ -301,9 +301,10 @@ def add_arguments(parser, argument_hashes, required=False):
             kwargs.update(required=True)
         parser.add_argument(*opt_strs, **kwargs)
 
-def output_args(args):
+def output_args(args, skip=[]):
     for k,v in args.__dict__.items():
-        logging.info("%s: %s" % (' '.join(k.split('_')), v))
+        if k not in skip:
+            logging.info("%s: %s" % (' '.join(k.split('_')), v))
 
 ## Configuration related options
 
