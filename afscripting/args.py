@@ -276,20 +276,12 @@ ConfigFileAction = create_config_file_action(['config'])
 
 class LogLevelAction(Action):
 
-    LOG_LEVELS = [
-        'DEBUG',
-        'INFO',
-        'WARNING',
-        'ERROR',
-        'CRITICAL'
-    ]
-
     def __call__(self, parser, namespace, value, option_string=None):
         """Parses log level string ('DEBUG', 'INFO', etc.)
         """
         if value:
             log_level = value.strip().upper()
-            if log_level not in self.LOG_LEVELS:
+            if not hasattr(logging, log_level):
                 raise ArgumentTypeError('Invalid log level: %s' % (log_level))
             level = getattr(logging, log_level)
             setattr(namespace, self.dest, level)
@@ -376,8 +368,7 @@ def add_logging_options(parser):
             'dest': "log_level",
             'action': LogLevelAction,
             'default': logging.WARNING,
-            'help': "python log level (%s); default WARNING" % (
-                ','.join(LogLevelAction.LOG_LEVELS))
+            'help': "python log level; default WARNING"
         },
         {
             'long': "--log-file",
