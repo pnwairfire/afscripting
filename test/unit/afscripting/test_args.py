@@ -5,7 +5,7 @@ __author__ = "Joel Dubowy"
 import argparse
 import tempfile
 
-from py.test import raises
+from pytest import raises
 
 import afscripting
 
