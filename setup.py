@@ -22,7 +22,7 @@ setup(
     description='Scripting related utilities',
     install_requires=[
         "afconfig>=1.0.0,<2.0.0",
-        "afdatetime>=2.0.0,<3.0.0"
+        "afdatetime>=3.0.0,<4.0.0"
     ],
     dependency_links=[
         "https://pypi.airfire.org/simple/afconfig/",
